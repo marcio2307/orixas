@@ -3,23 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#111111">
+  <meta name="theme-color" content="#ffffff">
   <meta name="description" content="Orixá do Dia — card automático por dia da semana.">
   <title>Orixá do Dia</title>
 
   <style>
     :root {
-      --bg: #080808;
-      --gold: #d6a93a;
-      --gold-light: #f4d77b;
-      --text: #fff;
-      --muted: #d5d5d5;
-      --panel: rgba(0,0,0,.48);
+      --bg: #ffffff;
+      --text: #000000;
+      --muted: #222222;
+      --gold: #b8860b;
+      --gold-light: #d4a72c;
+      --line: #c7a54b;
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
-    html, body {
+    html,
+    body {
       width: 100%;
       min-height: 100%;
       margin: 0;
@@ -36,8 +39,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      background:
-        radial-gradient(circle at 50% 0%, #29220f 0, #100e09 32%, #050505 72%);
+      background: #ffffff;
     }
 
     .app {
@@ -52,6 +54,7 @@
         max(10px, env(safe-area-inset-right))
         max(12px, env(safe-area-inset-bottom))
         max(10px, env(safe-area-inset-left));
+      background: #ffffff;
     }
 
     header {
@@ -66,13 +69,13 @@
       font-size: clamp(1.35rem, 4vw, 2.5rem);
       letter-spacing: .08em;
       text-transform: uppercase;
-      color: var(--gold-light);
-      text-shadow: 0 2px 8px #000;
+      color: #000000;
+      text-shadow: none;
     }
 
     .dia {
       margin: 6px 0 0;
-      color: var(--muted);
+      color: #000000;
       font-size: clamp(.82rem, 2vw, 1rem);
       letter-spacing: .05em;
     }
@@ -94,13 +97,12 @@
       min-height: 360px;
       position: relative;
       overflow: hidden;
-      border: 1px solid rgba(214,169,58,.55);
+      border: 1px solid var(--line);
       border-radius: 16px;
-      background: #000;
+      background: #ffffff;
       box-shadow:
-        0 0 0 1px rgba(255,255,255,.04) inset,
-        0 15px 55px rgba(0,0,0,.75),
-        0 0 35px rgba(214,169,58,.10);
+        0 0 0 1px rgba(0, 0, 0, .04) inset,
+        0 10px 35px rgba(0, 0, 0, .12);
       touch-action: pan-y pinch-zoom;
       user-select: none;
       -webkit-user-select: none;
@@ -110,7 +112,7 @@
       height: 100%;
       display: flex;
       will-change: transform;
-      transition: transform .38s cubic-bezier(.22,.61,.36,1);
+      transition: transform .38s cubic-bezier(.22, .61, .36, 1);
     }
 
     .slide {
@@ -120,7 +122,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #000;
+      background: #ffffff;
       position: relative;
     }
 
@@ -130,7 +132,7 @@
       height: 100%;
       object-fit: contain;
       object-position: center;
-      background: #000;
+      background: #ffffff;
       -webkit-user-drag: none;
       user-select: none;
     }
@@ -142,30 +144,37 @@
       z-index: 5;
       width: 54px;
       height: 54px;
-      border: 1px solid rgba(255,255,255,.35);
+      border: 1px solid #777777;
       border-radius: 50%;
-      background: rgba(0,0,0,.58);
-      color: white;
+      background: rgba(255, 255, 255, .92);
+      color: #000000;
       font-size: 34px;
       line-height: 1;
       cursor: pointer;
       display: grid;
       place-items: center;
       padding: 0 0 5px;
-      backdrop-filter: blur(5px);
-      -webkit-backdrop-filter: blur(5px);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, .16);
       transition: background .2s, transform .2s;
     }
 
     .arrow:hover {
-      background: rgba(214,169,58,.8);
+      background: #ffffff;
+      border-color: var(--gold);
       transform: translateY(-50%) scale(1.05);
     }
 
-    .arrow:active { transform: translateY(-50%) scale(.96); }
+    .arrow:active {
+      transform: translateY(-50%) scale(.96);
+    }
 
-    .prev { left: 12px; }
-    .next { right: 12px; }
+    .prev {
+      left: 12px;
+    }
+
+    .next {
+      right: 12px;
+    }
 
     .counter {
       position: absolute;
@@ -175,8 +184,9 @@
       z-index: 5;
       padding: 5px 11px;
       border-radius: 999px;
-      background: rgba(0,0,0,.62);
-      color: #fff;
+      background: rgba(255, 255, 255, .94);
+      color: #000000;
+      border: 1px solid #777777;
       font: 600 .78rem Arial, sans-serif;
       letter-spacing: .05em;
       pointer-events: none;
@@ -189,49 +199,58 @@
       justify-content: center;
       gap: 7px;
       padding: 8px 0 2px;
+      background: #ffffff;
     }
 
     .dot {
       width: 8px;
       height: 8px;
       padding: 0;
-      border: 0;
+      border: 1px solid #555555;
       border-radius: 50%;
-      background: #777;
+      background: #ffffff;
       cursor: pointer;
     }
 
     .dot.active {
-      background: var(--gold-light);
+      background: #000000;
+      border-color: #000000;
       transform: scale(1.35);
     }
 
     .status {
       width: min(1100px, 100%);
       text-align: center;
-      color: #aaa;
+      color: #000000;
       font: .72rem/1.35 Arial, sans-serif;
       padding: 4px 8px 0;
+      background: #ffffff;
     }
 
     .erro {
-      color: #ffb2b2;
+      color: #000000;
       font: 600 .9rem Arial, sans-serif;
       text-align: center;
       padding: 20px;
     }
 
     @media (max-width: 700px) {
-      .app { padding-top: max(6px, env(safe-area-inset-top)); }
+      .app {
+        padding-top: max(6px, env(safe-area-inset-top));
+      }
 
-      header { padding-bottom: 7px; }
+      header {
+        padding-bottom: 7px;
+      }
 
       .titulo {
         font-size: clamp(1.15rem, 6vw, 1.7rem);
         letter-spacing: .04em;
       }
 
-      .dia { font-size: .76rem; }
+      .dia {
+        font-size: .76rem;
+      }
 
       .carousel {
         height: min(78vh, 820px);
@@ -246,8 +265,13 @@
         font-size: 28px;
       }
 
-      .prev { left: 6px; }
-      .next { right: 6px; }
+      .prev {
+        left: 6px;
+      }
+
+      .next {
+        right: 6px;
+      }
 
       .counter {
         bottom: 7px;
@@ -270,9 +294,18 @@
     }
 
     @media (orientation: landscape) and (max-height: 600px) {
-      header { padding: 4px 8px; }
-      .titulo { font-size: 1.15rem; }
-      .dia { margin-top: 2px; }
+      header {
+        padding: 4px 8px;
+      }
+
+      .titulo {
+        font-size: 1.15rem;
+      }
+
+      .dia {
+        margin-top: 2px;
+      }
+
       .carousel {
         height: 78vh;
         height: 78dvh;
@@ -283,6 +316,7 @@
 
 <body>
   <main class="app">
+
     <header>
       <h1 class="titulo" id="titulo">ORIXÁ DO DIA</h1>
       <p class="dia" id="dia"></p>
@@ -290,27 +324,54 @@
 
     <section class="viewer" aria-label="Carrossel do Orixá do Dia">
       <div class="carousel" id="carousel">
+
         <div class="track" id="track"></div>
 
-        <button class="arrow prev" id="prev" type="button"
-                aria-label="Slide anterior" title="Anterior">‹</button>
+        <button
+          class="arrow prev"
+          id="prev"
+          type="button"
+          aria-label="Slide anterior"
+          title="Anterior">
+          ‹
+        </button>
 
-        <button class="arrow next" id="next" type="button"
-                aria-label="Próximo slide" title="Próximo">›</button>
+        <button
+          class="arrow next"
+          id="next"
+          type="button"
+          aria-label="Próximo slide"
+          title="Próximo">
+          ›
+        </button>
 
-        <div class="counter" id="counter" aria-live="polite"></div>
+        <div
+          class="counter"
+          id="counter"
+          aria-live="polite">
+        </div>
+
       </div>
     </section>
 
-    <nav class="dots" id="dots" aria-label="Selecionar slide"></nav>
+    <nav
+      class="dots"
+      id="dots"
+      aria-label="Selecionar slide">
+    </nav>
+
     <div class="status" id="status">
       Use as setas, clique e arraste no PC ou deslize com o dedo no celular/tablet.
     </div>
+
   </main>
 
   <script>
     /*
-      MAPA DOS ARQUIVOS NO GITHUB
+      ==========================================================
+      ORIXÁ DO DIA — CONFIGURAÇÃO DOS ARQUIVOS
+      ==========================================================
+
       1  = Oxalá
       2  = Iemanjá
       3  = Nanã Buruquê
@@ -319,82 +380,140 @@
       6  = Oxum
       7  = Iansã
       8  = Xangô
-      9  = Omulu/Obaluaê
-      10 = Erês/Ibeji
+      9  = Omulu / Obaluaê
+      10 = Erês / Ibeji
       11 = Exu
       12 = Yabás do Sábado
 
-      IMPORTANTE:
-      Os nomes abaixo usam exatamente "imagem 1.png", etc.
-      Se no GitHub os arquivos estiverem em uma pasta, por exemplo /imagens,
-      altere somente IMAGE_PATH para "imagens/".
+      Os arquivos devem ficar na mesma pasta deste index.html.
+
+      Nomes:
+      imagem 1.png
+      imagem 2.png
+      imagem 3.png
+      ...
+      imagem 12.png
     */
 
     const IMAGE_PATH = "./";
 
+    /*
+      ==========================================================
+      CALENDÁRIO
+      ==========================================================
+    */
+
     const orixasPorDia = {
-      0: { // Domingo
+
+      // DOMINGO
+      0: {
         nome: "ERÊS / IBEJI",
-        slides: ["imagem 10.png"],
+        slides: [
+          "imagem 10.png"
+        ],
         descricao: "Orixá do Dia — Domingo"
       },
 
-      1: { // Segunda
+      // SEGUNDA-FEIRA
+      1: {
         nome: "ORIXÁS DA SEGUNDA-FEIRA",
-        slides: ["imagem 11.png", "imagem 9.png", "imagem 3.png"],
+        slides: [
+          "imagem 11.png",
+          "imagem 9.png",
+          "imagem 3.png"
+        ],
         descricao: "Exu • Omulu / Obaluaê • Nanã Buruquê"
       },
 
-      2: { // Terça
+      // TERÇA-FEIRA
+      2: {
         nome: "OGUM",
-        slides: ["imagem 4.png"],
+        slides: [
+          "imagem 4.png"
+        ],
         descricao: "Orixá do Dia — Terça-feira"
       },
 
-      3: { // Quarta
+      // QUARTA-FEIRA
+      3: {
         nome: "ORIXÁS DA QUARTA-FEIRA",
-        slides: ["imagem 8.png", "imagem 7.png", "imagem 6.png"],
+        slides: [
+          "imagem 8.png",
+          "imagem 7.png",
+          "imagem 6.png"
+        ],
         descricao: "Xangô • Iansã • Oxum"
       },
 
-      4: { // Quinta
+      // QUINTA-FEIRA
+      4: {
         nome: "OXÓSSI",
-        slides: ["imagem 5.png"],
+        slides: [
+          "imagem 5.png"
+        ],
         descricao: "Orixá do Dia — Quinta-feira"
       },
 
-      5: { // Sexta
+      // SEXTA-FEIRA
+      5: {
         nome: "OXALÁ",
-        slides: ["imagem 1.png"],
+        slides: [
+          "imagem 1.png"
+        ],
         descricao: "Orixá do Dia — Sexta-feira"
       },
 
-      6: { // Sábado
+      // SÁBADO
+      6: {
         nome: "YABÁS DO SÁBADO",
-        // Primeiro o banner das Yabás; depois o slide individual de Iemanjá.
-        slides: ["imagem 12.png", "imagem 2.png"],
+        slides: [
+          "imagem 12.png",
+          "imagem 2.png"
+        ],
         descricao: "Yabás do Sábado • Iemanjá"
       }
     };
 
     const nomesDias = [
-      "Domingo", "Segunda-feira", "Terça-feira",
-      "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"
+      "Domingo",
+      "Segunda-feira",
+      "Terça-feira",
+      "Quarta-feira",
+      "Quinta-feira",
+      "Sexta-feira",
+      "Sábado"
     ];
+
+    /*
+      ==========================================================
+      DATA ATUAL DO NAVEGADOR
+      ==========================================================
+    */
 
     const hoje = new Date();
     const numeroDia = hoje.getDay();
     const dados = orixasPorDia[numeroDia];
+
+    /*
+      ==========================================================
+      ELEMENTOS
+      ==========================================================
+    */
 
     const track = document.getElementById("track");
     const dots = document.getElementById("dots");
     const counter = document.getElementById("counter");
     const titulo = document.getElementById("titulo");
     const dia = document.getElementById("dia");
-    const status = document.getElementById("status");
     const carousel = document.getElementById("carousel");
     const prev = document.getElementById("prev");
     const next = document.getElementById("next");
+
+    /*
+      ==========================================================
+      ESTADO DO CARROSSEL
+      ==========================================================
+    */
 
     let indice = 0;
     let inicioX = 0;
@@ -403,40 +522,76 @@
     let deslocamentoAtual = 0;
 
     titulo.textContent = dados.nome;
-    dia.textContent = `${nomesDias[numeroDia]} • ${dados.descricao}`;
+
+    dia.textContent =
+      `${nomesDias[numeroDia]} • ${dados.descricao}`;
+
+    /*
+      ==========================================================
+      CRIA OS SLIDES
+      ==========================================================
+    */
 
     function criarSlides() {
+
       track.innerHTML = "";
       dots.innerHTML = "";
 
       dados.slides.forEach((arquivo, i) => {
+
         const slide = document.createElement("div");
         slide.className = "slide";
 
         const img = document.createElement("img");
+
         img.src = IMAGE_PATH + arquivo;
-        img.alt = `${dados.nome} — slide ${i + 1}`;
+
+        img.alt =
+          `${dados.nome} — slide ${i + 1}`;
+
         img.draggable = false;
 
         img.addEventListener("error", () => {
+
           slide.innerHTML = `
             <div class="erro">
-              Não foi possível carregar:<br>
-              <strong>${arquivo}</strong><br><br>
-              Verifique se o nome do arquivo no GitHub está exatamente igual.
+              Não foi possível carregar:<br><br>
+              <strong>${arquivo}</strong>
+              <br><br>
+              Verifique se o nome do arquivo
+              no GitHub está exatamente igual.
             </div>
           `;
+
         });
 
         slide.appendChild(img);
         track.appendChild(slide);
 
+        /*
+          Os pontos só aparecem quando existe
+          mais de um slide.
+        */
+
         if (dados.slides.length > 1) {
-          const dot = document.createElement("button");
+
+          const dot =
+            document.createElement("button");
+
           dot.type = "button";
+
           dot.className = "dot";
-          dot.setAttribute("aria-label", `Ir para o slide ${i + 1}`);
-          dot.addEventListener("click", () => irPara(i));
+
+          dot.setAttribute(
+            "aria-label",
+            `Ir para o slide ${i + 1}`
+          );
+
+          dot.addEventListener(
+            "click",
+            () => irPara(i)
+          );
+
           dots.appendChild(dot);
         }
       });
@@ -444,96 +599,252 @@
       atualizar();
     }
 
+    /*
+      ==========================================================
+      ATUALIZA CARROSSEL
+      ==========================================================
+    */
+
     function atualizar() {
-      track.style.transform = `translate3d(${-indice * 100}%, 0, 0)`;
+
+      track.style.transform =
+        `translate3d(${-indice * 100}%, 0, 0)`;
 
       if (dados.slides.length > 1) {
-        counter.textContent = `${indice + 1} / ${dados.slides.length}`;
+
+        counter.textContent =
+          `${indice + 1} / ${dados.slides.length}`;
+
         [...dots.children].forEach((dot, i) => {
-          dot.classList.toggle("active", i === indice);
+
+          dot.classList.toggle(
+            "active",
+            i === indice
+          );
+
         });
+
         prev.style.display = "grid";
         next.style.display = "grid";
+
       } else {
+
         counter.textContent = "";
+
         prev.style.display = "none";
         next.style.display = "none";
       }
     }
 
+    /*
+      ==========================================================
+      MUDA SLIDE
+      ==========================================================
+    */
+
     function irPara(novoIndice) {
+
       const total = dados.slides.length;
-      indice = (novoIndice + total) % total;
+
+      indice =
+        (novoIndice + total) % total;
+
       atualizar();
     }
 
-    prev.addEventListener("click", () => irPara(indice - 1));
-    next.addEventListener("click", () => irPara(indice + 1));
+    prev.addEventListener(
+      "click",
+      () => irPara(indice - 1)
+    );
 
-    // Teclado no PC
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "ArrowLeft") irPara(indice - 1);
-      if (event.key === "ArrowRight") irPara(indice + 1);
-    });
+    next.addEventListener(
+      "click",
+      () => irPara(indice + 1)
+    );
 
-    // Toque / arraste: funciona em celular, tablet e PC.
-    carousel.addEventListener("pointerdown", (event) => {
-      if (dados.slides.length <= 1) return;
-      arrastando = true;
-      inicioX = event.clientX;
-      inicioY = event.clientY;
-      deslocamentoAtual = 0;
-      carousel.setPointerCapture?.(event.pointerId);
-      track.style.transition = "none";
-    });
+    /*
+      ==========================================================
+      TECLADO DO PC
+      ==========================================================
+    */
 
-    carousel.addEventListener("pointermove", (event) => {
-      if (!arrastando) return;
+    document.addEventListener(
+      "keydown",
+      (event) => {
 
-      const dx = event.clientX - inicioX;
-      const dy = event.clientY - inicioY;
+        if (event.key === "ArrowLeft") {
+          irPara(indice - 1);
+        }
 
-      // Se o gesto for claramente vertical, não interfere no scroll da página.
-      if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 10) return;
+        if (event.key === "ArrowRight") {
+          irPara(indice + 1);
+        }
 
-      deslocamentoAtual = dx;
-      const percentual = (dx / carousel.clientWidth) * 100;
-      track.style.transform =
-        `translate3d(calc(${-indice * 100}% + ${percentual}px), 0, 0)`;
-    });
+      }
+    );
+
+    /*
+      ==========================================================
+      MOUSE + DEDO
+      ==========================================================
+
+      Funciona com:
+      - mouse
+      - touch
+      - caneta
+      - celular
+      - tablet
+      - computador
+    */
+
+    carousel.addEventListener(
+      "pointerdown",
+      (event) => {
+
+        if (dados.slides.length <= 1) {
+          return;
+        }
+
+        arrastando = true;
+
+        inicioX = event.clientX;
+        inicioY = event.clientY;
+
+        deslocamentoAtual = 0;
+
+        carousel.setPointerCapture?.(
+          event.pointerId
+        );
+
+        track.style.transition = "none";
+      }
+    );
+
+    carousel.addEventListener(
+      "pointermove",
+      (event) => {
+
+        if (!arrastando) {
+          return;
+        }
+
+        const dx =
+          event.clientX - inicioX;
+
+        const dy =
+          event.clientY - inicioY;
+
+        /*
+          Se o movimento for vertical,
+          deixa o navegador fazer o scroll normal.
+        */
+
+        if (
+          Math.abs(dy) > Math.abs(dx) &&
+          Math.abs(dy) > 10
+        ) {
+          return;
+        }
+
+        deslocamentoAtual = dx;
+
+        const percentual =
+          (dx / carousel.clientWidth) * 100;
+
+        track.style.transform =
+          `translate3d(
+            calc(${-indice * 100}% + ${percentual}px),
+            0,
+            0
+          )`;
+      }
+    );
+
+    /*
+      ==========================================================
+      TERMINA O ARRASTE
+      ==========================================================
+    */
 
     function terminarArraste(event) {
-      if (!arrastando) return;
+
+      if (!arrastando) {
+        return;
+      }
 
       arrastando = false;
+
       track.style.transition = "";
 
-      const limite = Math.max(45, carousel.clientWidth * 0.12);
+      const limite =
+        Math.max(
+          45,
+          carousel.clientWidth * 0.12
+        );
 
       if (deslocamentoAtual < -limite) {
+
         irPara(indice + 1);
+
       } else if (deslocamentoAtual > limite) {
+
         irPara(indice - 1);
+
       } else {
+
         atualizar();
       }
 
       deslocamentoAtual = 0;
-      carousel.releasePointerCapture?.(event.pointerId);
+
+      carousel.releasePointerCapture?.(
+        event.pointerId
+      );
     }
 
-    carousel.addEventListener("pointerup", terminarArraste);
-    carousel.addEventListener("pointercancel", terminarArraste);
+    carousel.addEventListener(
+      "pointerup",
+      terminarArraste
+    );
 
-    // Impede o menu contextual sobre a imagem.
-    carousel.addEventListener("contextmenu", (event) => event.preventDefault());
+    carousel.addEventListener(
+      "pointercancel",
+      terminarArraste
+    );
+
+    /*
+      Impede o menu de contexto ao pressionar
+      sobre o card.
+    */
+
+    carousel.addEventListener(
+      "contextmenu",
+      (event) => event.preventDefault()
+    );
+
+    /*
+      ==========================================================
+      INICIA
+      ==========================================================
+    */
 
     criarSlides();
 
-    // Mostra no console para facilitar testes.
-    console.log("Orixá do Dia:", dados.nome);
-    console.log("Dia:", nomesDias[numeroDia]);
-    console.log("Slides:", dados.slides);
+    console.log(
+      "Orixá do Dia:",
+      dados.nome
+    );
+
+    console.log(
+      "Dia:",
+      nomesDias[numeroDia]
+    );
+
+    console.log(
+      "Slides:",
+      dados.slides
+    );
+
   </script>
 </body>
 </html>
