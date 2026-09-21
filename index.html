@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#111111">
+  <meta name="description" content="Orixá do Dia — card automático por dia da semana.">
+  <title>Orixá do Dia</title>
+
+  <style>
+    :root {
+      --bg: #080808;
+      --gold: #d6a93a;
+      --gold-light: #f4d77b;
+      --text: #fff;
+      --muted: #d5d5d5;
+      --panel: rgba(0,0,0,.48);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Georgia, "Times New Roman", serif;
+      overflow-x: hidden;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background:
+        radial-gradient(circle at 50% 0%, #29220f 0, #100e09 32%, #050505 72%);
+    }
+
+    .app {
+      width: 100%;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding:
+        max(12px, env(safe-area-inset-top))
+        max(10px, env(safe-area-inset-right))
+        max(12px, env(safe-area-inset-bottom))
+        max(10px, env(safe-area-inset-left));
+    }
+
+    header {
+      width: min(1100px, 100%);
+      text-align: center;
+      padding: 8px 8px 12px;
+      z-index: 2;
+    }
+
+    .titulo {
+      margin: 0;
+      font-size: clamp(1.35rem, 4vw, 2.5rem);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--gold-light);
+      text-shadow: 0 2px 8px #000;
+    }
+
+    .dia {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: clamp(.82rem, 2vw, 1rem);
+      letter-spacing: .05em;
+    }
+
+    .viewer {
+      position: relative;
+      width: min(1100px, 100%);
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .carousel {
+      width: 100%;
+      height: min(82vh, 900px);
+      height: min(82dvh, 900px);
+      min-height: 360px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(214,169,58,.55);
+      border-radius: 16px;
+      background: #000;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,.04) inset,
+        0 15px 55px rgba(0,0,0,.75),
+        0 0 35px rgba(214,169,58,.10);
+      touch-action: pan-y pinch-zoom;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .track {
+      height: 100%;
+      display: flex;
+      will-change: transform;
+      transition: transform .38s cubic-bezier(.22,.61,.36,1);
+    }
+
+    .slide {
+      flex: 0 0 100%;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+      position: relative;
+    }
+
+    .slide img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center;
+      background: #000;
+      -webkit-user-drag: none;
+      user-select: none;
+    }
+
+    .arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 5;
+      width: 54px;
+      height: 54px;
+      border: 1px solid rgba(255,255,255,.35);
+      border-radius: 50%;
+      background: rgba(0,0,0,.58);
+      color: white;
+      font-size: 34px;
+      line-height: 1;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      padding: 0 0 5px;
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      transition: background .2s, transform .2s;
+    }
+
+    .arrow:hover {
+      background: rgba(214,169,58,.8);
+      transform: translateY(-50%) scale(1.05);
+    }
+
+    .arrow:active { transform: translateY(-50%) scale(.96); }
+
+    .prev { left: 12px; }
+    .next { right: 12px; }
+
+    .counter {
+      position: absolute;
+      left: 50%;
+      bottom: 12px;
+      transform: translateX(-50%);
+      z-index: 5;
+      padding: 5px 11px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.62);
+      color: #fff;
+      font: 600 .78rem Arial, sans-serif;
+      letter-spacing: .05em;
+      pointer-events: none;
+    }
+
+    .dots {
+      min-height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 8px 0 2px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      background: #777;
+      cursor: pointer;
+    }
+
+    .dot.active {
+      background: var(--gold-light);
+      transform: scale(1.35);
+    }
+
+    .status {
+      width: min(1100px, 100%);
+      text-align: center;
+      color: #aaa;
+      font: .72rem/1.35 Arial, sans-serif;
+      padding: 4px 8px 0;
+    }
+
+    .erro {
+      color: #ffb2b2;
+      font: 600 .9rem Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+
+    @media (max-width: 700px) {
+      .app { padding-top: max(6px, env(safe-area-inset-top)); }
+
+      header { padding-bottom: 7px; }
+
+      .titulo {
+        font-size: clamp(1.15rem, 6vw, 1.7rem);
+        letter-spacing: .04em;
+      }
+
+      .dia { font-size: .76rem; }
+
+      .carousel {
+        height: min(78vh, 820px);
+        height: min(78dvh, 820px);
+        min-height: 300px;
+        border-radius: 10px;
+      }
+
+      .arrow {
+        width: 44px;
+        height: 44px;
+        font-size: 28px;
+      }
+
+      .prev { left: 6px; }
+      .next { right: 6px; }
+
+      .counter {
+        bottom: 7px;
+        font-size: .7rem;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .carousel {
+        height: 76vh;
+        height: 76dvh;
+        min-height: 270px;
+      }
+
+      .arrow {
+        width: 40px;
+        height: 40px;
+        font-size: 25px;
+      }
+    }
+
+    @media (orientation: landscape) and (max-height: 600px) {
+      header { padding: 4px 8px; }
+      .titulo { font-size: 1.15rem; }
+      .dia { margin-top: 2px; }
+      .carousel {
+        height: 78vh;
+        height: 78dvh;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+    <header>
+      <h1 class="titulo" id="titulo">ORIXÁ DO DIA</h1>
+      <p class="dia" id="dia"></p>
+    </header>
+
+    <section class="viewer" aria-label="Carrossel do Orixá do Dia">
+      <div class="carousel" id="carousel">
+        <div class="track" id="track"></div>
+
+        <button class="arrow prev" id="prev" type="button"
+                aria-label="Slide anterior" title="Anterior">‹</button>
+
+        <button class="arrow next" id="next" type="button"
+                aria-label="Próximo slide" title="Próximo">›</button>
+
+        <div class="counter" id="counter" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <nav class="dots" id="dots" aria-label="Selecionar slide"></nav>
+    <div class="status" id="status">
+      Use as setas, clique e arraste no PC ou deslize com o dedo no celular/tablet.
+    </div>
+  </main>
+
+  <script>
+    /*
+      MAPA DOS ARQUIVOS NO GITHUB
+      1  = Oxalá
+      2  = Iemanjá
+      3  = Nanã Buruquê
+      4  = Ogum
+      5  = Oxóssi
+      6  = Oxum
+      7  = Iansã
+      8  = Xangô
+      9  = Omulu/Obaluaê
+      10 = Erês/Ibeji
+      11 = Exu
+      12 = Yabás do Sábado
+
+      IMPORTANTE:
+      Os nomes abaixo usam exatamente "imagem 1.png", etc.
+      Se no GitHub os arquivos estiverem em uma pasta, por exemplo /imagens,
+      altere somente IMAGE_PATH para "imagens/".
+    */
+
+    const IMAGE_PATH = "./";
+
+    const orixasPorDia = {
+      0: { // Domingo
+        nome: "ERÊS / IBEJI",
+        slides: ["imagem 10.png"],
+        descricao: "Orixá do Dia — Domingo"
+      },
+
+      1: { // Segunda
+        nome: "ORIXÁS DA SEGUNDA-FEIRA",
+        slides: ["imagem 11.png", "imagem 9.png", "imagem 3.png"],
+        descricao: "Exu • Omulu / Obaluaê • Nanã Buruquê"
+      },
+
+      2: { // Terça
+        nome: "OGUM",
+        slides: ["imagem 4.png"],
+        descricao: "Orixá do Dia — Terça-feira"
+      },
+
+      3: { // Quarta
+        nome: "ORIXÁS DA QUARTA-FEIRA",
+        slides: ["imagem 8.png", "imagem 7.png", "imagem 6.png"],
+        descricao: "Xangô • Iansã • Oxum"
+      },
+
+      4: { // Quinta
+        nome: "OXÓSSI",
+        slides: ["imagem 5.png"],
+        descricao: "Orixá do Dia — Quinta-feira"
+      },
+
+      5: { // Sexta
+        nome: "OXALÁ",
+        slides: ["imagem 1.png"],
+        descricao: "Orixá do Dia — Sexta-feira"
+      },
+
+      6: { // Sábado
+        nome: "YABÁS DO SÁBADO",
+        // Primeiro o banner das Yabás; depois o slide individual de Iemanjá.
+        slides: ["imagem 12.png", "imagem 2.png"],
+        descricao: "Yabás do Sábado • Iemanjá"
+      }
+    };
+
+    const nomesDias = [
+      "Domingo", "Segunda-feira", "Terça-feira",
+      "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"
+    ];
+
+    const hoje = new Date();
+    const numeroDia = hoje.getDay();
+    const dados = orixasPorDia[numeroDia];
+
+    const track = document.getElementById("track");
+    const dots = document.getElementById("dots");
+    const counter = document.getElementById("counter");
+    const titulo = document.getElementById("titulo");
+    const dia = document.getElementById("dia");
+    const status = document.getElementById("status");
+    const carousel = document.getElementById("carousel");
+    const prev = document.getElementById("prev");
+    const next = document.getElementById("next");
+
+    let indice = 0;
+    let inicioX = 0;
+    let inicioY = 0;
+    let arrastando = false;
+    let deslocamentoAtual = 0;
+
+    titulo.textContent = dados.nome;
+    dia.textContent = `${nomesDias[numeroDia]} • ${dados.descricao}`;
+
+    function criarSlides() {
+      track.innerHTML = "";
+      dots.innerHTML = "";
+
+      dados.slides.forEach((arquivo, i) => {
+        const slide = document.createElement("div");
+        slide.className = "slide";
+
+        const img = document.createElement("img");
+        img.src = IMAGE_PATH + arquivo;
+        img.alt = `${dados.nome} — slide ${i + 1}`;
+        img.draggable = false;
+
+        img.addEventListener("error", () => {
+          slide.innerHTML = `
+            <div class="erro">
+              Não foi possível carregar:<br>
+              <strong>${arquivo}</strong><br><br>
+              Verifique se o nome do arquivo no GitHub está exatamente igual.
+            </div>
+          `;
+        });
+
+        slide.appendChild(img);
+        track.appendChild(slide);
+
+        if (dados.slides.length > 1) {
+          const dot = document.createElement("button");
+          dot.type = "button";
+          dot.className = "dot";
+          dot.setAttribute("aria-label", `Ir para o slide ${i + 1}`);
+          dot.addEventListener("click", () => irPara(i));
+          dots.appendChild(dot);
+        }
+      });
+
+      atualizar();
+    }
+
+    function atualizar() {
+      track.style.transform = `translate3d(${-indice * 100}%, 0, 0)`;
+
+      if (dados.slides.length > 1) {
+        counter.textContent = `${indice + 1} / ${dados.slides.length}`;
+        [...dots.children].forEach((dot, i) => {
+          dot.classList.toggle("active", i === indice);
+        });
+        prev.style.display = "grid";
+        next.style.display = "grid";
+      } else {
+        counter.textContent = "";
+        prev.style.display = "none";
+        next.style.display = "none";
+      }
+    }
+
+    function irPara(novoIndice) {
+      const total = dados.slides.length;
+      indice = (novoIndice + total) % total;
+      atualizar();
+    }
+
+    prev.addEventListener("click", () => irPara(indice - 1));
+    next.addEventListener("click", () => irPara(indice + 1));
+
+    // Teclado no PC
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowLeft") irPara(indice - 1);
+      if (event.key === "ArrowRight") irPara(indice + 1);
+    });
+
+    // Toque / arraste: funciona em celular, tablet e PC.
+    carousel.addEventListener("pointerdown", (event) => {
+      if (dados.slides.length <= 1) return;
+      arrastando = true;
+      inicioX = event.clientX;
+      inicioY = event.clientY;
+      deslocamentoAtual = 0;
+      carousel.setPointerCapture?.(event.pointerId);
+      track.style.transition = "none";
+    });
+
+    carousel.addEventListener("pointermove", (event) => {
+      if (!arrastando) return;
+
+      const dx = event.clientX - inicioX;
+      const dy = event.clientY - inicioY;
+
+      // Se o gesto for claramente vertical, não interfere no scroll da página.
+      if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 10) return;
+
+      deslocamentoAtual = dx;
+      const percentual = (dx / carousel.clientWidth) * 100;
+      track.style.transform =
+        `translate3d(calc(${-indice * 100}% + ${percentual}px), 0, 0)`;
+    });
+
+    function terminarArraste(event) {
+      if (!arrastando) return;
+
+      arrastando = false;
+      track.style.transition = "";
+
+      const limite = Math.max(45, carousel.clientWidth * 0.12);
+
+      if (deslocamentoAtual < -limite) {
+        irPara(indice + 1);
+      } else if (deslocamentoAtual > limite) {
+        irPara(indice - 1);
+      } else {
+        atualizar();
+      }
+
+      deslocamentoAtual = 0;
+      carousel.releasePointerCapture?.(event.pointerId);
+    }
+
+    carousel.addEventListener("pointerup", terminarArraste);
+    carousel.addEventListener("pointercancel", terminarArraste);
+
+    // Impede o menu contextual sobre a imagem.
+    carousel.addEventListener("contextmenu", (event) => event.preventDefault());
+
+    criarSlides();
+
+    // Mostra no console para facilitar testes.
+    console.log("Orixá do Dia:", dados.nome);
+    console.log("Dia:", nomesDias[numeroDia]);
+    console.log("Slides:", dados.slides);
+  </script>
+</body>
+</html>
