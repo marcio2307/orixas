@@ -1,850 +1,2137 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#ffffff">
-  <meta name="description" content="Orixá do Dia — card automático por dia da semana.">
-  <title>Orixá do Dia</title>
 
-  <style>
-    :root {
-      --bg: #ffffff;
-      --text: #000000;
-      --muted: #222222;
-      --gold: #b8860b;
-      --gold-light: #d4a72c;
-      --line: #c7a54b;
-    }
+<meta charset="UTF-8">
 
-    * {
-      box-sizing: border-box;
-    }
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+>
 
-    html,
-    body {
-      width: 100%;
-      min-height: 100%;
-      margin: 0;
-      padding: 0;
-      background: var(--bg);
-      color: var(--text);
-      font-family: Georgia, "Times New Roman", serif;
-      overflow-x: hidden;
-    }
+<title>Meu Terreiro</title>
 
-    body {
-      min-height: 100vh;
-      min-height: 100dvh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: #ffffff;
-    }
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
 
-    .app {
-      width: 100%;
-      min-height: 100vh;
-      min-height: 100dvh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding:
-        max(12px, env(safe-area-inset-top))
-        max(10px, env(safe-area-inset-right))
-        max(12px, env(safe-area-inset-bottom))
-        max(10px, env(safe-area-inset-left));
-      background: #ffffff;
-    }
+<meta name="theme-color" content="#2aa449">
 
-    header {
-      width: min(1100px, 100%);
-      text-align: center;
-      padding: 8px 8px 12px;
-      z-index: 2;
-    }
+<!-- ANDROID -->
+<meta name="mobile-web-app-capable" content="yes">
 
-    .titulo {
-      margin: 0;
-      font-size: clamp(1.35rem, 4vw, 2.5rem);
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      color: #000000;
-      text-shadow: none;
-    }
+<!-- IOS -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Meu Terreiro">
 
-    .dia {
-      margin: 6px 0 0;
-      color: #000000;
-      font-size: clamp(.82rem, 2vw, 1rem);
-      letter-spacing: .05em;
-    }
+<link rel="apple-touch-icon" href="logo-192.jpg">
 
-    .viewer {
-      position: relative;
-      width: min(1100px, 100%);
-      flex: 1;
-      min-height: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+<!-- FAVICON -->
+<link rel="icon" type="image/png" sizes="192x192" href="logo-192.jpg">
 
-    .carousel {
-      width: 100%;
-      height: min(82vh, 900px);
-      height: min(82dvh, 900px);
-      min-height: 360px;
-      position: relative;
-      overflow: hidden;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      background: #ffffff;
-      box-shadow:
-        0 0 0 1px rgba(0, 0, 0, .04) inset,
-        0 10px 35px rgba(0, 0, 0, .12);
-      touch-action: pan-y pinch-zoom;
-      user-select: none;
-      -webkit-user-select: none;
-    }
+<!-- FONT AWESOME -->
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+>
 
-    .track {
-      height: 100%;
-      display: flex;
-      will-change: transform;
-      transition: transform .38s cubic-bezier(.22, .61, .36, 1);
-    }
+<style>
 
-    .slide {
-      flex: 0 0 100%;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #ffffff;
-      position: relative;
-    }
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
 
-    .slide img {
-      display: block;
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      object-position: center;
-      background: #ffffff;
-      -webkit-user-drag: none;
-      user-select: none;
-    }
+html{
+  width:100%;
+  min-height:100%;
+}
 
-    .arrow {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      z-index: 5;
-      width: 54px;
-      height: 54px;
-      border: 1px solid #777777;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, .92);
-      color: #000000;
-      font-size: 34px;
-      line-height: 1;
-      cursor: pointer;
-      display: grid;
-      place-items: center;
-      padding: 0 0 5px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, .16);
-      transition: background .2s, transform .2s;
-    }
+body{
+  font-family:Arial,sans-serif;
+  background:#ffffff;
+  min-height:100vh;
+  min-height:100dvh;
+  overflow-x:hidden;
+  -webkit-text-size-adjust:100%;
+}
 
-    .arrow:hover {
-      background: #ffffff;
-      border-color: var(--gold);
-      transform: translateY(-50%) scale(1.05);
-    }
+/* =====================================================
+   PESQUISA GOOGLE
+   ===================================================== */
 
-    .arrow:active {
-      transform: translateY(-50%) scale(.96);
-    }
+.google-search{
+  display:flex;
+  justify-content:center;
+  width:100%;
+  padding:10px 14px 0;
+}
 
-    .prev {
-      left: 12px;
-    }
+.google-search form{
+  display:flex;
+  width:100%;
+  max-width:600px;
+  height:46px;
+}
 
-    .next {
-      right: 12px;
-    }
+.google-search input{
+  flex:1;
+  min-width:0;
+  padding:0 16px;
 
-    .counter {
-      position: absolute;
-      left: 50%;
-      bottom: 12px;
-      transform: translateX(-50%);
-      z-index: 5;
-      padding: 5px 11px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, .94);
-      color: #000000;
-      border: 1px solid #777777;
-      font: 600 .78rem Arial, sans-serif;
-      letter-spacing: .05em;
-      pointer-events: none;
-    }
+  border:1px solid #d0d0d0;
+  border-right:none;
 
-    .dots {
-      min-height: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 7px;
-      padding: 8px 0 2px;
-      background: #ffffff;
-    }
+  border-radius:24px 0 0 24px;
 
-    .dot {
-      width: 8px;
-      height: 8px;
-      padding: 0;
-      border: 1px solid #555555;
-      border-radius: 50%;
-      background: #ffffff;
-      cursor: pointer;
-    }
+  outline:none;
 
-    .dot.active {
-      background: #000000;
-      border-color: #000000;
-      transform: scale(1.35);
-    }
+  font-size:16px;
 
-    .status {
-      width: min(1100px, 100%);
-      text-align: center;
-      color: #000000;
-      font: .72rem/1.35 Arial, sans-serif;
-      padding: 4px 8px 0;
-      background: #ffffff;
-    }
+  box-shadow:0 2px 6px rgba(0,0,0,.10);
 
-    .erro {
-      color: #000000;
-      font: 600 .9rem Arial, sans-serif;
-      text-align: center;
-      padding: 20px;
-    }
+  -webkit-appearance:none;
+  appearance:none;
+}
 
-    @media (max-width: 700px) {
-      .app {
-        padding-top: max(6px, env(safe-area-inset-top));
-      }
+.google-search input:focus{
+  border-color:#2aa449;
+  box-shadow:0 2px 8px rgba(42,164,73,.25);
+}
 
-      header {
-        padding-bottom: 7px;
-      }
+.google-search button{
+  width:58px;
+  flex-shrink:0;
 
-      .titulo {
-        font-size: clamp(1.15rem, 6vw, 1.7rem);
-        letter-spacing: .04em;
-      }
+  border:none;
 
-      .dia {
-        font-size: .76rem;
-      }
+  border-radius:0 24px 24px 0;
 
-      .carousel {
-        height: min(78vh, 820px);
-        height: min(78dvh, 820px);
-        min-height: 300px;
-        border-radius: 10px;
-      }
+  background:#2aa449;
+  color:#fff;
 
-      .arrow {
-        width: 44px;
-        height: 44px;
-        font-size: 28px;
-      }
+  font-size:18px;
 
-      .prev {
-        left: 6px;
-      }
+  cursor:pointer;
 
-      .next {
-        right: 6px;
-      }
+  box-shadow:0 2px 6px rgba(0,0,0,.10);
 
-      .counter {
-        bottom: 7px;
-        font-size: .7rem;
-      }
-    }
+  -webkit-tap-highlight-color:transparent;
+}
 
-    @media (max-width: 420px) {
-      .carousel {
-        height: 76vh;
-        height: 76dvh;
-        min-height: 270px;
-      }
+.google-search button:hover{
+  background:#218b3d;
+}
 
-      .arrow {
-        width: 40px;
-        height: 40px;
-        font-size: 25px;
-      }
-    }
+/* =====================================================
+   CABEÇALHO
+   ===================================================== */
 
-    @media (orientation: landscape) and (max-height: 600px) {
-      header {
-        padding: 4px 8px;
-      }
+header{
+  text-align:center;
+  padding:24px 10px 14px;
+}
 
-      .titulo {
-        font-size: 1.15rem;
-      }
+.logo{
+  width:180px;
+  max-width:70vw;
+  height:auto;
+  display:block;
+  margin:0 auto 10px;
+}
 
-      .dia {
-        margin-top: 2px;
-      }
+/* =====================================================
+   PLAYER RÁDIO
+   ===================================================== */
 
-      .carousel {
-        height: 78vh;
-        height: 78dvh;
-      }
-    }
-  </style>
+.radio-player{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:10px;
+  margin-bottom:12px;
+}
+
+.radio-btn{
+  width:72px;
+  height:72px;
+
+  border-radius:50%;
+  border:none;
+
+  background:#2aa449;
+  color:#ffffff;
+
+  font-size:28px;
+
+  cursor:pointer;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  box-shadow:0 6px 16px rgba(0,0,0,.25);
+
+  transition:
+    transform .15s ease,
+    box-shadow .15s ease;
+
+  -webkit-tap-highlight-color:transparent;
+}
+
+.radio-btn:hover{
+  transform:scale(1.05);
+  box-shadow:0 10px 22px rgba(0,0,0,.3);
+}
+
+.radio-btn:active{
+  transform:scale(.96);
+}
+
+.radio-title{
+  font-size:15px;
+  font-weight:900;
+  color:#2aa449;
+}
+
+.title{
+  font-size:22px;
+  font-weight:900;
+  color:#2aa449;
+}
+
+/* =====================================================
+   CARDS
+   ===================================================== */
+
+.wrap{
+  padding:14px;
+  width:100%;
+  max-width:1200px;
+  margin:auto;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+
+@media(min-width:560px){
+
+  .grid{
+    grid-template-columns:repeat(3,1fr);
+  }
+
+}
+
+@media(min-width:860px){
+
+  .grid{
+    grid-template-columns:repeat(4,1fr);
+  }
+
+}
+
+.card{
+  background:#2aa449;
+
+  border-radius:18px;
+
+  padding:20px 10px;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+
+  gap:12px;
+
+  cursor:pointer;
+
+  transition:
+    transform .15s ease,
+    box-shadow .15s ease;
+
+  -webkit-tap-highlight-color:transparent;
+
+  user-select:none;
+}
+
+.card:hover{
+  transform:scale(1.03);
+  box-shadow:0 10px 22px rgba(0,0,0,.15);
+}
+
+.card:active{
+  transform:scale(.98);
+}
+
+.iconBox{
+  width:64px;
+  height:64px;
+
+  border-radius:20px;
+
+  background:rgba(255,255,255,.25);
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  flex-shrink:0;
+}
+
+.iconBox i{
+  font-size:30px;
+  color:#ffffff;
+}
+
+.iconSvg{
+  width:34px;
+  height:34px;
+}
+
+.iconStroke{
+  fill:none;
+  stroke:#ffffff;
+  stroke-width:2.6;
+  stroke-linejoin:round;
+  stroke-linecap:round;
+}
+
+.label{
+  font-size:14px;
+  font-weight:900;
+  color:#ffffff;
+  text-align:center;
+}
+
+/* =====================================================
+   POPUP ORIXÁ DO DIA
+   ===================================================== */
+
+.daily-overlay{
+  position:fixed;
+  inset:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,.68);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+  z-index:100000;
+  backdrop-filter:blur(5px);
+  -webkit-backdrop-filter:blur(5px);
+}
+
+.daily-popup{
+  position:relative;
+  width:min(96vw, 560px);
+  max-height:94vh;
+  max-height:94dvh;
+  background:#fff;
+  border-radius:22px;
+  padding:14px;
+  box-shadow:0 24px 70px rgba(0,0,0,.38);
+  animation:dailyEntrada .28s ease;
+  overflow:hidden;
+}
+
+@keyframes dailyEntrada{
+  from{
+    opacity:0;
+    transform:translateY(22px) scale(.96);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
+}
+
+.daily-close{
+  position:absolute;
+  top:8px;
+  right:8px;
+  z-index:20;
+  width:40px;
+  height:40px;
+  border:1px solid #bbb;
+  border-radius:50%;
+  background:rgba(255,255,255,.96);
+  color:#000;
+  font-size:25px;
+  line-height:1;
+  cursor:pointer;
+  display:grid;
+  place-items:center;
+  box-shadow:0 3px 10px rgba(0,0,0,.16);
+  -webkit-tap-highlight-color:transparent;
+}
+
+.daily-close:hover{
+  background:#000;
+  color:#fff;
+}
+
+.daily-title{
+  text-align:center;
+  color:#000;
+  font-size:clamp(19px,4vw,26px);
+  font-weight:900;
+  letter-spacing:.04em;
+  margin:2px 45px 4px;
+  text-transform:uppercase;
+}
+
+.daily-day{
+  text-align:center;
+  color:#333;
+  font-size:13px;
+  margin:0 45px 10px;
+}
+
+.daily-carousel{
+  position:relative;
+  width:100%;
+  height:min(72vh,760px);
+  height:min(72dvh,760px);
+  min-height:280px;
+  overflow:hidden;
+  border:1px solid #c7a54b;
+  border-radius:14px;
+  background:#fff;
+  touch-action:pan-y pinch-zoom;
+  user-select:none;
+  -webkit-user-select:none;
+}
+
+.daily-track{
+  height:100%;
+  display:flex;
+  transition:transform .38s cubic-bezier(.22,.61,.36,1);
+  will-change:transform;
+}
+
+.daily-slide{
+  flex:0 0 100%;
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#fff;
+}
+
+.daily-slide img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  object-position:center;
+  display:block;
+  background:#fff;
+  -webkit-user-drag:none;
+}
+
+.daily-arrow{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  z-index:10;
+  width:46px;
+  height:46px;
+  border:1px solid #777;
+  border-radius:50%;
+  background:rgba(255,255,255,.94);
+  color:#000;
+  font-size:31px;
+  line-height:1;
+  cursor:pointer;
+  display:grid;
+  place-items:center;
+  padding:0 0 5px;
+  box-shadow:0 3px 10px rgba(0,0,0,.16);
+}
+
+.daily-arrow:hover{
+  background:#000;
+  color:#fff;
+}
+
+.daily-prev{left:7px;}
+.daily-next{right:7px;}
+
+.daily-counter{
+  position:absolute;
+  left:50%;
+  bottom:8px;
+  transform:translateX(-50%);
+  z-index:10;
+  padding:4px 10px;
+  border-radius:999px;
+  background:rgba(255,255,255,.94);
+  color:#000;
+  border:1px solid #777;
+  font:600 12px Arial,sans-serif;
+}
+
+.daily-dots{
+  min-height:22px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:7px;
+  padding-top:7px;
+}
+
+.daily-dot{
+  width:8px;
+  height:8px;
+  border:1px solid #555;
+  border-radius:50%;
+  background:#fff;
+  padding:0;
+  cursor:pointer;
+}
+
+.daily-dot.active{
+  background:#000;
+  border-color:#000;
+  transform:scale(1.35);
+}
+
+.daily-error{
+  color:#000;
+  text-align:center;
+  padding:20px;
+  font:600 14px Arial,sans-serif;
+}
+
+@media(max-width:480px){
+  .daily-overlay{padding:8px;}
+  .daily-popup{
+    width:98vw;
+    border-radius:18px;
+    padding:9px;
+  }
+  .daily-close{
+    width:38px;
+    height:38px;
+    top:6px;
+    right:6px;
+  }
+  .daily-title{
+    font-size:18px;
+    margin-top:3px;
+  }
+  .daily-day{font-size:12px;}
+  .daily-carousel{
+    height:76vh;
+    height:76dvh;
+    min-height:270px;
+    border-radius:11px;
+  }
+  .daily-arrow{
+    width:40px;
+    height:40px;
+    font-size:27px;
+  }
+}
+
+/* =====================================================
+   POPUP DE INSTALAÇÃO PWA
+   ===================================================== */
+
+.pwa-overlay{
+
+  position:fixed;
+
+  inset:0;
+
+  width:100%;
+  height:100%;
+
+  background:rgba(0,0,0,.62);
+
+  display:none;
+
+  align-items:center;
+  justify-content:center;
+
+  padding:18px;
+
+  z-index:99999;
+
+  backdrop-filter:blur(4px);
+  -webkit-backdrop-filter:blur(4px);
+}
+
+.pwa-popup{
+
+  width:100%;
+  max-width:430px;
+
+  background:#ffffff;
+
+  border-radius:24px;
+
+  padding:24px 20px 20px;
+
+  box-shadow:
+    0 20px 60px rgba(0,0,0,.30);
+
+  text-align:center;
+
+  animation:pwaEntrada .25s ease;
+
+  max-height:90vh;
+  overflow-y:auto;
+}
+
+@keyframes pwaEntrada{
+
+  from{
+    opacity:0;
+    transform:translateY(25px) scale(.96);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
+
+}
+
+.pwa-icon{
+
+  width:82px;
+  height:82px;
+
+  object-fit:contain;
+
+  margin:0 auto 12px;
+
+  border-radius:18px;
+
+  box-shadow:0 5px 15px rgba(0,0,0,.15);
+}
+
+.pwa-popup h2{
+
+  color:#2aa449;
+
+  font-size:21px;
+
+  margin-bottom:10px;
+
+  font-weight:900;
+}
+
+.pwa-popup p{
+
+  color:#444;
+
+  font-size:15px;
+
+  line-height:1.5;
+
+  margin-bottom:14px;
+}
+
+.pwa-steps{
+
+  background:#f1faf3;
+
+  border:1px solid #d5eedb;
+
+  border-radius:16px;
+
+  padding:15px;
+
+  text-align:left;
+
+  color:#333;
+
+  font-size:14px;
+
+  line-height:1.65;
+
+  margin-bottom:15px;
+}
+
+.pwa-steps strong{
+
+  color:#2aa449;
+}
+
+.pwa-install{
+
+  width:100%;
+
+  border:none;
+
+  border-radius:14px;
+
+  padding:14px;
+
+  background:#2aa449;
+
+  color:#fff;
+
+  font-size:16px;
+
+  font-weight:900;
+
+  cursor:pointer;
+
+  margin-bottom:9px;
+
+  -webkit-tap-highlight-color:transparent;
+}
+
+.pwa-install:hover{
+  background:#218b3d;
+}
+
+.pwa-close{
+
+  width:100%;
+
+  border:1px solid #ddd;
+
+  border-radius:14px;
+
+  padding:12px;
+
+  background:#fff;
+
+  color:#555;
+
+  font-size:14px;
+
+  cursor:pointer;
+}
+
+.pwa-link{
+
+  display:inline-block;
+
+  margin-top:10px;
+
+  color:#2aa449;
+
+  font-size:13px;
+
+  font-weight:bold;
+
+  text-decoration:none;
+}
+
+/* =====================================================
+   CELULAR
+   ===================================================== */
+
+@media(max-width:480px){
+
+  header{
+    padding-top:18px;
+  }
+
+  .logo{
+    width:160px;
+  }
+
+  .radio-btn{
+    width:68px;
+    height:68px;
+  }
+
+  .title{
+    font-size:21px;
+  }
+
+  .card{
+    padding:18px 8px;
+  }
+
+  .iconBox{
+    width:60px;
+    height:60px;
+  }
+
+  .iconBox i{
+    font-size:27px;
+  }
+
+  .pwa-popup{
+    padding:21px 16px 16px;
+  }
+
+}
+
+/* =====================================================
+   TABLET / PC
+   ===================================================== */
+
+@media(min-width:700px){
+
+  .google-search{
+    padding-top:18px;
+  }
+
+  header{
+    padding-top:28px;
+  }
+
+  .pwa-popup{
+    max-width:460px;
+  }
+
+}
+
+/* =====================================================
+   SAFE AREA IPHONE
+   ===================================================== */
+
+@supports(padding:max(0px)){
+
+  body{
+    padding-bottom:max(0px, env(safe-area-inset-bottom));
+  }
+
+  .pwa-overlay{
+    padding-top:max(18px, env(safe-area-inset-top));
+    padding-bottom:max(18px, env(safe-area-inset-bottom));
+  }
+
+}
+
+
+/* =====================================================
+   VISUAL MODERNO — SOMENTE PC / DESKTOP
+   Celular e tablet permanecem com o layout original.
+   ===================================================== */
+
+@media (min-width:1024px){
+
+  html{
+    background:#f4f7f5;
+  }
+
+  body{
+    background:
+      radial-gradient(circle at 50% 0%, rgba(42,164,73,.10), transparent 420px),
+      #f4f7f5;
+  }
+
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    background:linear-gradient(
+      180deg,
+      rgba(255,255,255,.75) 0,
+      rgba(255,255,255,0) 260px
+    );
+    z-index:-1;
+  }
+
+  .google-search{
+    padding:28px 20px 0;
+  }
+
+  .google-search form{
+    max-width:620px;
+    height:48px;
+    border-radius:26px;
+    box-shadow:
+      0 4px 18px rgba(0,0,0,.08),
+      0 1px 3px rgba(0,0,0,.06);
+  }
+
+  .google-search input{
+    background:#fff;
+    font-size:15px;
+    border-color:#dfe5e1;
+  }
+
+  .google-search button{
+    width:62px;
+  }
+
+  /* Cabeçalho transparente no PC:
+     logo, rádio e título ficam diretamente sobre o fundo. */
+  header{
+    width:min(980px, calc(100% - 40px));
+    margin:18px auto 0;
+    padding:22px 20px 14px;
+    background:transparent;
+    border:none;
+    border-radius:0;
+    box-shadow:none;
+  }
+
+  .logo{
+    width:142px;
+    max-width:none;
+    margin:0 auto 16px;
+    border-radius:10px;
+    box-shadow:none;
+  }
+
+  .radio-player{
+    gap:7px;
+    margin-bottom:10px;
+  }
+
+  .radio-btn{
+    width:64px;
+    height:64px;
+    font-size:25px;
+    box-shadow:0 8px 20px rgba(42,164,73,.25);
+  }
+
+  .radio-title{
+    font-size:14px;
+  }
+
+  .title{
+    margin-top:4px;
+    font-size:25px;
+    letter-spacing:.2px;
+  }
+
+  .wrap{
+    width:100%;
+    max-width:1020px;
+    padding:26px 20px 50px;
+  }
+
+  /* PC: 3 colunas x 2 linhas.
+     Assim Pontos Riscados fica exatamente abaixo de Baralho Cigano
+     e os seis cards formam um conjunto perfeitamente centralizado. */
+  .grid{
+    width:100%;
+    max-width:820px;
+    margin:0 auto;
+    grid-template-columns:repeat(3, 1fr);
+    gap:16px;
+    justify-content:center;
+  }
+
+  .card{
+    min-height:156px;
+    padding:22px 14px;
+    border-radius:20px;
+    background:linear-gradient(145deg, #2eae50, #249b43);
+    box-shadow:
+      0 7px 18px rgba(25,100,45,.12),
+      inset 0 1px 0 rgba(255,255,255,.14);
+  }
+
+  .card:hover{
+    transform:translateY(-5px);
+    box-shadow:
+      0 14px 28px rgba(25,100,45,.18),
+      inset 0 1px 0 rgba(255,255,255,.16);
+  }
+
+  .iconBox{
+    width:68px;
+    height:68px;
+    border-radius:20px;
+    background:rgba(255,255,255,.22);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.18);
+  }
+
+  .iconBox i{
+    font-size:29px;
+  }
+
+  .iconSvg{
+    width:35px;
+    height:35px;
+  }
+
+  .label{
+    font-size:14px;
+    letter-spacing:.1px;
+  }
+
+  .pwa-popup{
+    max-width:470px;
+  }
+}
+
+@media (min-width:1400px){
+
+  .google-search form{
+    max-width:650px;
+  }
+
+  header{
+    width:980px;
+  }
+
+  .grid{
+    max-width:820px;
+  }
+}
+
+</style>
+
 </head>
 
 <body>
-  <main class="app">
 
-    <header>
-      <h1 class="titulo" id="titulo">ORIXÁ DO DIA</h1>
-      <p class="dia" id="dia"></p>
-    </header>
+<!-- =====================================================
+     PESQUISA GOOGLE
+     ===================================================== -->
 
-    <section class="viewer" aria-label="Carrossel do Orixá do Dia">
-      <div class="carousel" id="carousel">
+<div class="google-search">
 
-        <div class="track" id="track"></div>
+  <form
+    action="https://www.google.com/search"
+    method="get"
+  >
 
-        <button
-          class="arrow prev"
-          id="prev"
-          type="button"
-          aria-label="Slide anterior"
-          title="Anterior">
-          ‹
-        </button>
+    <input
+      type="search"
+      name="q"
+      placeholder="Pesquisar no Google..."
+      autocomplete="off"
+      aria-label="Pesquisar no Google"
+    >
 
-        <button
-          class="arrow next"
-          id="next"
-          type="button"
-          aria-label="Próximo slide"
-          title="Próximo">
-          ›
-        </button>
+    <button
+      type="submit"
+      aria-label="Pesquisar"
+    >
+      <i class="fa-solid fa-magnifying-glass"></i>
+    </button>
 
-        <div
-          class="counter"
-          id="counter"
-          aria-live="polite">
-        </div>
+  </form>
 
-      </div>
-    </section>
+</div>
 
-    <nav
-      class="dots"
-      id="dots"
-      aria-label="Selecionar slide">
-    </nav>
 
-    <div class="status" id="status">
-      
+<!-- =====================================================
+     CABEÇALHO
+     ===================================================== -->
+
+<header>
+
+  <img
+    class="logo"
+    src="logo.jpg"
+    alt="Logo"
+  >
+
+  <!-- PLAYER RÁDIO -->
+
+  <div class="radio-player">
+
+    <button
+      class="radio-btn"
+      id="radioBtn"
+      aria-label="Tocar rádio"
+    >
+
+      <i class="fa-solid fa-play"></i>
+
+    </button>
+
+    <div class="radio-title">
+      Rádio
     </div>
 
-  </main>
-
-  <script>
-    /*
-      ==========================================================
-      ORIXÁ DO DIA — CONFIGURAÇÃO DOS ARQUIVOS
-      ==========================================================
-
-      1  = Oxalá
-      2  = Iemanjá
-      3  = Nanã Buruquê
-      4  = Ogum
-      5  = Oxóssi
-      6  = Oxum
-      7  = Iansã
-      8  = Xangô
-      9  = Omulu / Obaluaê
-      10 = Erês / Ibeji
-      11 = Exu
-      12 = Yabás do Sábado
-
-      Os arquivos devem ficar na mesma pasta deste index.html.
-
-      Nomes:
-      imagem 1.png
-      imagem 2.png
-      imagem 3.png
-      ...
-      imagem 12.png
-    */
-
-    const IMAGE_PATH = "./";
-
-    /*
-      ==========================================================
-      CALENDÁRIO
-      ==========================================================
-    */
-
-    const orixasPorDia = {
-
-      // DOMINGO
-      0: {
-        nome: "ERÊS / IBEJI",
-        slides: [
-          "imagem 10.png"
-        ],
-        descricao: "Orixá do Dia — Domingo"
-      },
-
-      // SEGUNDA-FEIRA
-      1: {
-        nome: "ORIXÁS DA SEGUNDA-FEIRA",
-        slides: [
-          "imagem 11.png",
-          "imagem 9.png",
-          "imagem 3.png"
-        ],
-        descricao: "Exu • Omulu / Obaluaê • Nanã Buruquê"
-      },
-
-      // TERÇA-FEIRA
-      2: {
-        nome: "OGUM",
-        slides: [
-          "imagem 4.png"
-        ],
-        descricao: "Orixá do Dia — Terça-feira"
-      },
-
-      // QUARTA-FEIRA
-      3: {
-        nome: "ORIXÁS DA QUARTA-FEIRA",
-        slides: [
-          "imagem 8.png",
-          "imagem 7.png",
-          "imagem 6.png"
-        ],
-        descricao: "Xangô • Iansã • Oxum"
-      },
-
-      // QUINTA-FEIRA
-      4: {
-        nome: "OXÓSSI",
-        slides: [
-          "imagem 5.png"
-        ],
-        descricao: "Orixá do Dia — Quinta-feira"
-      },
-
-      // SEXTA-FEIRA
-      5: {
-        nome: "OXALÁ",
-        slides: [
-          "imagem 1.png"
-        ],
-        descricao: "Orixá do Dia — Sexta-feira"
-      },
-
-      // SÁBADO
-      6: {
-        nome: "YABÁS DO SÁBADO",
-        slides: [
-          "imagem 12.png",
-          "imagem 2.png"
-        ],
-        descricao: "Yabás do Sábado • Iemanjá"
-      }
-    };
-
-    const nomesDias = [
-      "Domingo",
-      "Segunda-feira",
-      "Terça-feira",
-      "Quarta-feira",
-      "Quinta-feira",
-      "Sexta-feira",
-      "Sábado"
-    ];
-
-    /*
-      ==========================================================
-      DATA ATUAL DO NAVEGADOR
-      ==========================================================
-    */
-
-    const hoje = new Date();
-    const numeroDia = hoje.getDay();
-    const dados = orixasPorDia[numeroDia];
-
-    /*
-      ==========================================================
-      ELEMENTOS
-      ==========================================================
-    */
-
-    const track = document.getElementById("track");
-    const dots = document.getElementById("dots");
-    const counter = document.getElementById("counter");
-    const titulo = document.getElementById("titulo");
-    const dia = document.getElementById("dia");
-    const carousel = document.getElementById("carousel");
-    const prev = document.getElementById("prev");
-    const next = document.getElementById("next");
-
-    /*
-      ==========================================================
-      ESTADO DO CARROSSEL
-      ==========================================================
-    */
-
-    let indice = 0;
-    let inicioX = 0;
-    let inicioY = 0;
-    let arrastando = false;
-    let deslocamentoAtual = 0;
-
-    titulo.textContent = dados.nome;
-
-    dia.textContent =
-      `${nomesDias[numeroDia]} • ${dados.descricao}`;
-
-    /*
-      ==========================================================
-      CRIA OS SLIDES
-      ==========================================================
-    */
+  </div>
 
-    function criarSlides() {
+  <div class="title">
+    Meu Terreiro
+  </div>
 
-      track.innerHTML = "";
-      dots.innerHTML = "";
+</header>
 
-      dados.slides.forEach((arquivo, i) => {
 
-        const slide = document.createElement("div");
-        slide.className = "slide";
-
-        const img = document.createElement("img");
+<!-- =====================================================
+     RÁDIO
+     ===================================================== -->
 
-        img.src = IMAGE_PATH + arquivo;
+<audio
+  id="radio"
+  src="https://stream.zeno.fm/l8ocj9i6ka2uv"
+  preload="none"
+></audio>
 
-        img.alt =
-          `${dados.nome} — slide ${i + 1}`;
 
-        img.draggable = false;
+<!-- =====================================================
+     CARDS
+     ===================================================== -->
 
-        img.addEventListener("error", () => {
+<main class="wrap">
 
-          slide.innerHTML = `
-            <div class="erro">
-              Não foi possível carregar:<br><br>
-              <strong>${arquivo}</strong>
-              <br><br>
-              Verifique se o nome do arquivo
-              no GitHub está exatamente igual.
-            </div>
-          `;
+  <section class="grid">
 
-        });
+    <div
+      class="card"
+      onclick="location.href='https://drive.google.com/file/d/1kKAL9yGVrU-c8Y9ecBApVUHG2qbuoHFV/view?usp=sharing'"
+    >
 
-        slide.appendChild(img);
-        track.appendChild(slide);
+      <div class="iconBox">
+        <i class="fa-solid fa-book"></i>
+      </div>
 
-        /*
-          Os pontos só aparecem quando existe
-          mais de um slide.
-        */
+      <div class="label">
+        Apostila
+      </div>
 
-        if (dados.slides.length > 1) {
+    </div>
 
-          const dot =
-            document.createElement("button");
 
-          dot.type = "button";
+    <div
+      class="card"
+      onclick="location.href='https://drive.google.com/file/d/1-gQvm5UyiCnP2ldptVAgwI5GAasupd4P/view?usp=sharing'"
+    >
 
-          dot.className = "dot";
+      <div class="iconBox">
+        <i class="fa-solid fa-leaf"></i>
+      </div>
 
-          dot.setAttribute(
-            "aria-label",
-            `Ir para o slide ${i + 1}`
-          );
+      <div class="label">
+        Banhos
+      </div>
 
-          dot.addEventListener(
-            "click",
-            () => irPara(i)
-          );
+    </div>
 
-          dots.appendChild(dot);
-        }
-      });
-
-      atualizar();
-    }
-
-    /*
-      ==========================================================
-      ATUALIZA CARROSSEL
-      ==========================================================
-    */
-
-    function atualizar() {
-
-      track.style.transform =
-        `translate3d(${-indice * 100}%, 0, 0)`;
-
-      if (dados.slides.length > 1) {
 
-        counter.textContent =
-          `${indice + 1} / ${dados.slides.length}`;
+    <div
+      class="card"
+      onclick="location.href='https://drive.google.com/file/d/1-X-vCFH_LbymUyLMESntPfqBGduIUc-R/view?usp=sharing'"
+    >
 
-        [...dots.children].forEach((dot, i) => {
+      <div class="iconBox">
 
-          dot.classList.toggle(
-            "active",
-            i === indice
-          );
+        <svg
+          class="iconSvg"
+          viewBox="0 0 64 64"
+        >
 
-        });
+          <rect
+            x="16"
+            y="10"
+            width="32"
+            height="44"
+            rx="6"
+            class="iconStroke"
+          />
 
-        prev.style.display = "grid";
-        next.style.display = "grid";
+          <rect
+            x="20"
+            y="14"
+            width="24"
+            height="36"
+            rx="4"
+            class="iconStroke"
+            opacity=".6"
+          />
 
-      } else {
+          <circle
+            cx="32"
+            cy="32"
+            r="6"
+            class="iconStroke"
+          />
 
-        counter.textContent = "";
+        </svg>
 
-        prev.style.display = "none";
-        next.style.display = "none";
-      }
-    }
+      </div>
 
-    /*
-      ==========================================================
-      MUDA SLIDE
-      ==========================================================
-    */
+      <div class="label">
+        Baralho Cigano
+      </div>
 
-    function irPara(novoIndice) {
+    </div>
 
-      const total = dados.slides.length;
-
-      indice =
-        (novoIndice + total) % total;
 
-      atualizar();
-    }
+    <div
+      class="card"
+      onclick="location.href='https://marcio2307.github.io/terreiro/ponto.html'"
+    >
 
-    prev.addEventListener(
-      "click",
-      () => irPara(indice - 1)
-    );
+      <div class="iconBox">
 
-    next.addEventListener(
-      "click",
-      () => irPara(indice + 1)
-    );
-
-    /*
-      ==========================================================
-      TECLADO DO PC
-      ==========================================================
-    */
-
-    document.addEventListener(
-      "keydown",
-      (event) => {
-
-        if (event.key === "ArrowLeft") {
-          irPara(indice - 1);
-        }
+        <svg
+          class="iconSvg"
+          viewBox="0 0 64 64"
+        >
 
-        if (event.key === "ArrowRight") {
-          irPara(indice + 1);
-        }
+          <polygon
+            points="32 8, 56 48, 8 48"
+            class="iconStroke"
+          />
 
-      }
-    );
+          <polygon
+            points="32 56, 56 16, 8 16"
+            class="iconStroke"
+          />
 
-    /*
-      ==========================================================
-      MOUSE + DEDO
-      ==========================================================
+        </svg>
 
-      Funciona com:
-      - mouse
-      - touch
-      - caneta
-      - celular
-      - tablet
-      - computador
-    */
+      </div>
 
-    carousel.addEventListener(
-      "pointerdown",
-      (event) => {
+      <div class="label">
+        Pontos Riscados
+      </div>
 
-        if (dados.slides.length <= 1) {
-          return;
-        }
+    </div>
 
-        arrastando = true;
 
-        inicioX = event.clientX;
-        inicioY = event.clientY;
+    <div
+      class="card"
+      onclick="location.href='https://marcio2307.github.io/prova/index.html'"
+    >
 
-        deslocamentoAtual = 0;
+      <div class="iconBox">
+        <i class="fa-solid fa-clipboard-check"></i>
+      </div>
 
-        carousel.setPointerCapture?.(
-          event.pointerId
-        );
+      <div class="label">
+        Provas
+      </div>
 
-        track.style.transition = "none";
-      }
-    );
+    </div>
 
-    carousel.addEventListener(
-      "pointermove",
-      (event) => {
 
-        if (!arrastando) {
-          return;
-        }
+    <div
+      class="card"
+      onclick="location.href='https://marcio2307.github.io/terreiro/reuni%C3%A3o.html'"
+    >
 
-        const dx =
-          event.clientX - inicioX;
+      <div class="iconBox">
+        <i class="fa-solid fa-video"></i>
+      </div>
 
-        const dy =
-          event.clientY - inicioY;
+      <div class="label">
+        Reunião
+      </div>
 
-        /*
-          Se o movimento for vertical,
-          deixa o navegador fazer o scroll normal.
-        */
+    </div>
 
-        if (
-          Math.abs(dy) > Math.abs(dx) &&
-          Math.abs(dy) > 10
-        ) {
-          return;
-        }
+  </section>
 
-        deslocamentoAtual = dx;
+</main>
 
-        const percentual =
-          (dx / carousel.clientWidth) * 100;
 
-        track.style.transform =
-          `translate3d(
-            calc(${-indice * 100}% + ${percentual}px),
-            0,
-            0
-          )`;
-      }
-    );
+<!-- =====================================================
+     POPUP ORIXÁ DO DIA
+     ===================================================== -->
 
-    /*
-      ==========================================================
-      TERMINA O ARRASTE
-      ==========================================================
-    */
+<div class="daily-overlay" id="dailyOverlay" role="dialog"
+     aria-modal="true" aria-labelledby="dailyTitle">
 
-    function terminarArraste(event) {
+  <div class="daily-popup">
 
-      if (!arrastando) {
-        return;
-      }
+    <button
+      class="daily-close"
+      id="dailyClose"
+      type="button"
+      aria-label="Fechar Orixá do Dia"
+      title="Fechar">
+      ×
+    </button>
 
-      arrastando = false;
+    <div class="daily-title" id="dailyTitle">
+      ORIXÁ DO DIA
+    </div>
 
-      track.style.transition = "";
+    <div class="daily-day" id="dailyDay"></div>
 
-      const limite =
-        Math.max(
-          45,
-          carousel.clientWidth * 0.12
-        );
+    <div class="daily-carousel" id="dailyCarousel">
 
-      if (deslocamentoAtual < -limite) {
+      <div class="daily-track" id="dailyTrack"></div>
 
-        irPara(indice + 1);
+      <button
+        class="daily-arrow daily-prev"
+        id="dailyPrev"
+        type="button"
+        aria-label="Orixá anterior">
+        ‹
+      </button>
 
-      } else if (deslocamentoAtual > limite) {
+      <button
+        class="daily-arrow daily-next"
+        id="dailyNext"
+        type="button"
+        aria-label="Próximo Orixá">
+        ›
+      </button>
 
-        irPara(indice - 1);
+      <div class="daily-counter" id="dailyCounter"></div>
 
-      } else {
+    </div>
 
-        atualizar();
-      }
+    <div class="daily-dots" id="dailyDots"></div>
 
-      deslocamentoAtual = 0;
+  </div>
+</div>
 
-      carousel.releasePointerCapture?.(
-        event.pointerId
+
+<!-- =====================================================
+     POPUP PWA
+     ===================================================== -->
+
+<div
+  class="pwa-overlay"
+  id="pwaOverlay"
+>
+
+  <div class="pwa-popup">
+
+    <img
+      src="logo-192.jpg"
+      class="pwa-icon"
+      alt="Aplicativo Meu Terreiro"
+    >
+
+    <h2 id="pwaTitulo">
+      Instale o Meu Terreiro
+    </h2>
+
+    <p id="pwaTexto">
+      Tenha acesso rápido ao Meu Terreiro diretamente pela tela inicial do seu aparelho.
+    </p>
+
+    <div
+      class="pwa-steps"
+      id="pwaSteps"
+    >
+    </div>
+
+    <button
+      class="pwa-install"
+      id="pwaInstall"
+      style="display:none;"
+    >
+      INSTALAR APLICATIVO
+    </button>
+
+    <button
+      class="pwa-close"
+      id="pwaClose"
+    >
+      CONTINUAR NO NAVEGADOR
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- =====================================================
+     JAVASCRIPT
+     ===================================================== -->
+
+<script>
+
+/* =====================================================
+   ORIXÁ DO DIA — POPUP AUTOMÁTICO
+   ===================================================== */
+
+const dailyImages = {
+  0: { // Domingo
+    nome: "ERÊS / IBEJI",
+    descricao: "Orixá do Dia — Domingo",
+    slides: ["imagem 10.png"]
+  },
+
+  1: { // Segunda-feira
+    nome: "ORIXÁS DA SEGUNDA-FEIRA",
+    descricao: "Exu • Omulu / Obaluaê • Nanã Buruquê",
+    slides: [
+      "imagem 11.png",
+      "imagem 9.png",
+      "imagem 3.png"
+    ]
+  },
+
+  2: { // Terça-feira
+    nome: "OGUM",
+    descricao: "Orixá do Dia — Terça-feira",
+    slides: ["imagem 4.png"]
+  },
+
+  3: { // Quarta-feira
+    nome: "ORIXÁS DA QUARTA-FEIRA",
+    descricao: "Xangô • Iansã • Oxum",
+    slides: [
+      "imagem 8.png",
+      "imagem 7.png",
+      "imagem 6.png"
+    ]
+  },
+
+  4: { // Quinta-feira
+    nome: "OXÓSSI",
+    descricao: "Orixá do Dia — Quinta-feira",
+    slides: ["imagem 5.png"]
+  },
+
+  5: { // Sexta-feira
+    nome: "OXALÁ",
+    descricao: "Orixá do Dia — Sexta-feira",
+    slides: ["imagem 1.png"]
+  },
+
+  6: { // Sábado
+    nome: "YABÁS DO SÁBADO",
+    descricao: "Yabás do Sábado • Iemanjá",
+    slides: [
+      "imagem 12.png",
+      "imagem 2.png"
+    ]
+  }
+};
+
+const dailyDays = [
+  "Domingo",
+  "Segunda-feira",
+  "Terça-feira",
+  "Quarta-feira",
+  "Quinta-feira",
+  "Sexta-feira",
+  "Sábado"
+];
+
+const dailyToday = new Date();
+const dailyDayNumber = dailyToday.getDay();
+const dailyData = dailyImages[dailyDayNumber];
+
+const dailyOverlay = document.getElementById("dailyOverlay");
+const dailyClose = document.getElementById("dailyClose");
+const dailyTitle = document.getElementById("dailyTitle");
+const dailyDay = document.getElementById("dailyDay");
+const dailyCarousel = document.getElementById("dailyCarousel");
+const dailyTrack = document.getElementById("dailyTrack");
+const dailyDots = document.getElementById("dailyDots");
+const dailyCounter = document.getElementById("dailyCounter");
+const dailyPrev = document.getElementById("dailyPrev");
+const dailyNext = document.getElementById("dailyNext");
+
+let dailyIndex = 0;
+let dailyStartX = 0;
+let dailyStartY = 0;
+let dailyDragging = false;
+let dailyDx = 0;
+
+function dailyCreateSlides(){
+
+  dailyTrack.innerHTML = "";
+  dailyDots.innerHTML = "";
+
+  dailyData.slides.forEach((file, index) => {
+
+    const slide = document.createElement("div");
+    slide.className = "daily-slide";
+
+    const img = document.createElement("img");
+    img.src = file;
+    img.alt = `${dailyData.nome} — slide ${index + 1}`;
+    img.draggable = false;
+
+    img.addEventListener("error", () => {
+      slide.innerHTML = `
+        <div class="daily-error">
+          Não foi possível carregar:<br><br>
+          <strong>${file}</strong><br><br>
+          Confira se a imagem está na mesma pasta do index.html.
+        </div>
+      `;
+    });
+
+    slide.appendChild(img);
+    dailyTrack.appendChild(slide);
+
+    if(dailyData.slides.length > 1){
+
+      const dot = document.createElement("button");
+      dot.type = "button";
+      dot.className = "daily-dot";
+      dot.setAttribute(
+        "aria-label",
+        `Abrir slide ${index + 1}`
       );
+
+      dot.addEventListener(
+        "click",
+        () => dailyGoTo(index)
+      );
+
+      dailyDots.appendChild(dot);
+    }
+  });
+
+  dailyUpdate();
+}
+
+function dailyUpdate(){
+
+  dailyTrack.style.transform =
+    `translate3d(${-dailyIndex * 100}%,0,0)`;
+
+  if(dailyData.slides.length > 1){
+
+    dailyCounter.textContent =
+      `${dailyIndex + 1} / ${dailyData.slides.length}`;
+
+    [...dailyDots.children].forEach((dot,index) => {
+      dot.classList.toggle(
+        "active",
+        index === dailyIndex
+      );
+    });
+
+    dailyPrev.style.display = "grid";
+    dailyNext.style.display = "grid";
+
+  }else{
+
+    dailyCounter.textContent = "";
+    dailyPrev.style.display = "none";
+    dailyNext.style.display = "none";
+  }
+}
+
+function dailyGoTo(newIndex){
+
+  const total = dailyData.slides.length;
+
+  dailyIndex =
+    (newIndex + total) % total;
+
+  dailyUpdate();
+}
+
+function openDailyPopup(){
+
+  dailyTitle.textContent =
+    dailyData.nome;
+
+  dailyDay.textContent =
+    `${dailyDays[dailyDayNumber]} • ${dailyData.descricao}`;
+
+  dailyIndex = 0;
+
+  dailyCreateSlides();
+
+  dailyOverlay.style.display = "flex";
+
+  document.body.style.overflow = "hidden";
+
+  setTimeout(() => {
+    dailyClose.focus();
+  }, 50);
+}
+
+function closeDailyPopup(){
+
+  dailyOverlay.style.display = "none";
+
+  document.body.style.overflow = "";
+}
+
+dailyClose.addEventListener(
+  "click",
+  closeDailyPopup
+);
+
+dailyPrev.addEventListener(
+  "click",
+  () => dailyGoTo(dailyIndex - 1)
+);
+
+dailyNext.addEventListener(
+  "click",
+  () => dailyGoTo(dailyIndex + 1)
+);
+
+/* ESC também fecha no PC */
+document.addEventListener("keydown",(event)=>{
+
+  if(event.key === "Escape"){
+    closeDailyPopup();
+  }
+
+  if(dailyOverlay.style.display === "flex"){
+
+    if(event.key === "ArrowLeft"){
+      dailyGoTo(dailyIndex - 1);
     }
 
-    carousel.addEventListener(
-      "pointerup",
-      terminarArraste
+    if(event.key === "ArrowRight"){
+      dailyGoTo(dailyIndex + 1);
+    }
+  }
+});
+
+/* Clique fora do card fecha */
+dailyOverlay.addEventListener(
+  "click",
+  (event) => {
+
+    if(event.target === dailyOverlay){
+      closeDailyPopup();
+    }
+
+  }
+);
+
+/* Arrastar com mouse / dedo */
+dailyCarousel.addEventListener(
+  "pointerdown",
+  (event) => {
+
+    if(dailyData.slides.length <= 1){
+      return;
+    }
+
+    dailyDragging = true;
+    dailyStartX = event.clientX;
+    dailyStartY = event.clientY;
+    dailyDx = 0;
+
+    dailyCarousel.setPointerCapture?.(
+      event.pointerId
     );
 
-    carousel.addEventListener(
-      "pointercancel",
-      terminarArraste
+    dailyTrack.style.transition = "none";
+  }
+);
+
+dailyCarousel.addEventListener(
+  "pointermove",
+  (event) => {
+
+    if(!dailyDragging){
+      return;
+    }
+
+    const dx =
+      event.clientX - dailyStartX;
+
+    const dy =
+      event.clientY - dailyStartY;
+
+    if(
+      Math.abs(dy) > Math.abs(dx) &&
+      Math.abs(dy) > 10
+    ){
+      return;
+    }
+
+    dailyDx = dx;
+
+    const percent =
+      (dx / dailyCarousel.clientWidth) * 100;
+
+    dailyTrack.style.transform =
+      `translate3d(
+        calc(${-dailyIndex * 100}% + ${percent}px),
+        0,
+        0
+      )`;
+  }
+);
+
+function dailyEndDrag(event){
+
+  if(!dailyDragging){
+    return;
+  }
+
+  dailyDragging = false;
+  dailyTrack.style.transition = "";
+
+  const limit =
+    Math.max(
+      45,
+      dailyCarousel.clientWidth * .12
     );
 
-    /*
-      Impede o menu de contexto ao pressionar
-      sobre o card.
-    */
+  if(dailyDx < -limit){
+    dailyGoTo(dailyIndex + 1);
+  }else if(dailyDx > limit){
+    dailyGoTo(dailyIndex - 1);
+  }else{
+    dailyUpdate();
+  }
 
-    carousel.addEventListener(
-      "contextmenu",
-      (event) => event.preventDefault()
+  dailyDx = 0;
+
+  dailyCarousel.releasePointerCapture?.(
+    event.pointerId
+  );
+}
+
+dailyCarousel.addEventListener(
+  "pointerup",
+  dailyEndDrag
+);
+
+dailyCarousel.addEventListener(
+  "pointercancel",
+  dailyEndDrag
+);
+
+dailyCarousel.addEventListener(
+  "contextmenu",
+  event => event.preventDefault()
+);
+
+/*
+  Abre automaticamente quando o Meu Terreiro
+  termina de carregar.
+*/
+window.addEventListener(
+  "load",
+  () => {
+
+    setTimeout(
+      openDailyPopup,
+      500
     );
 
-    /*
-      ==========================================================
-      INICIA
-      ==========================================================
-    */
+  }
+);
 
-    criarSlides();
+
+/* =====================================================
+   RÁDIO
+   ===================================================== */
+
+const radio = document.getElementById("radio");
+const radioBtn = document.getElementById("radioBtn");
+const radioIcon = radioBtn.querySelector("i");
+
+radioBtn.addEventListener("click", async () => {
+
+  try{
+
+    if(radio.paused){
+
+      await radio.play();
+
+      radioIcon.classList.remove("fa-play");
+      radioIcon.classList.add("fa-pause");
+
+    }else{
+
+      radio.pause();
+
+      radioIcon.classList.remove("fa-pause");
+      radioIcon.classList.add("fa-play");
+
+    }
+
+  }catch(error){
+
+    console.log("Não foi possível iniciar a rádio:",error);
+
+  }
+
+});
+
+
+/* =====================================================
+   PWA
+   ===================================================== */
+
+let deferredPrompt = null;
+
+
+/* Detecta Android */
+
+function isAndroid(){
+
+  return /android/i.test(
+    navigator.userAgent
+  );
+
+}
+
+
+/* Detecta iPhone/iPad */
+
+function isIOS(){
+
+  return /iphone|ipad|ipod/i.test(
+    navigator.userAgent
+  );
+
+}
+
+
+/* Detecta navegador interno */
+
+function isInAppBrowser(){
+
+  const ua =
+    navigator.userAgent.toLowerCase();
+
+  return (
+    ua.includes("instagram") ||
+    ua.includes("fbav") ||
+    ua.includes("fban") ||
+    ua.includes("facebook") ||
+    ua.includes("messenger")
+  );
+
+}
+
+
+/* Detecta PWA instalado */
+
+function isStandalone(){
+
+  return (
+    window.matchMedia(
+      "(display-mode: standalone)"
+    ).matches ||
+
+    window.navigator.standalone === true
+  );
+
+}
+
+
+/* =====================================================
+   ANDROID / CHROME
+   Captura o pedido de instalação
+   ===================================================== */
+
+window.addEventListener(
+  "beforeinstallprompt",
+  function(event){
+
+    event.preventDefault();
+
+    deferredPrompt = event;
+
+    const installBtn =
+      document.getElementById("pwaInstall");
+
+    if(installBtn){
+
+      installBtn.style.display =
+        "block";
+
+    }
+
+  }
+);
+
+
+/* =====================================================
+   POPUP
+   ===================================================== */
+
+function abrirPopupPWA(){
+
+  /* Não mostra se já estiver instalado */
+
+  if(isStandalone()){
+
+    return;
+
+  }
+
+
+  const overlay =
+    document.getElementById("pwaOverlay");
+
+  const titulo =
+    document.getElementById("pwaTitulo");
+
+  const texto =
+    document.getElementById("pwaTexto");
+
+  const steps =
+    document.getElementById("pwaSteps");
+
+  const installBtn =
+    document.getElementById("pwaInstall");
+
+
+  overlay.style.display =
+    "flex";
+
+
+  /* =================================================
+     FACEBOOK / INSTAGRAM
+     ================================================= */
+
+  if(isInAppBrowser()){
+
+    titulo.innerText =
+      "Abra no navegador";
+
+    texto.innerHTML =
+      "Você está acessando o site pelo navegador interno do Facebook ou Instagram.";
+
+    steps.innerHTML = `
+
+      <strong>Para instalar o aplicativo:</strong><br><br>
+
+      1. Toque nos <b>três pontinhos ⋮</b> ou no menu do navegador.<br>
+
+      2. Escolha <b>“Abrir no navegador”</b> ou
+      <b>“Abrir no Chrome/Safari”</b>.<br>
+
+      3. Quando o site abrir no navegador,
+      siga as instruções de instalação.<br>
+
+    `;
+
+    installBtn.style.display =
+      "none";
+
+    return;
+
+  }
+
+
+  /* =================================================
+     IPHONE / IPAD
+     ================================================= */
+
+  if(isIOS()){
+
+    titulo.innerText =
+      "Instale no iPhone ou iPad";
+
+    texto.innerHTML =
+      "Você pode colocar o Meu Terreiro na tela inicial e abrir como um aplicativo.";
+
+    steps.innerHTML = `
+
+      <strong>No Safari:</strong><br><br>
+
+      1. Toque no botão
+      <b>Compartilhar</b>
+      <br>
+
+      2. Role a lista para baixo.<br>
+
+      3. Toque em
+      <b>“Adicionar à Tela de Início”</b>.<br>
+
+      4. Toque em
+      <b>Adicionar</b>.<br><br>
+
+      Depois o ícone <b>Meu Terreiro</b>
+      aparecerá na tela do seu iPhone/iPad.
+
+    `;
+
+    installBtn.style.display =
+      "none";
+
+    return;
+
+  }
+
+
+  /* =================================================
+     ANDROID
+     ================================================= */
+
+  if(isAndroid()){
+
+    titulo.innerText =
+      "Instale o Meu Terreiro";
+
+    texto.innerHTML =
+      "Instale o Meu Terreiro na tela inicial do seu Android para acessar rapidamente.";
+
+    steps.innerHTML = `
+
+      <strong>No Android:</strong><br><br>
+
+      Se aparecer o botão abaixo,
+      toque em <b>INSTALAR APLICATIVO</b>.<br><br>
+
+      Se o botão não aparecer:<br>
+
+      1. Abra o menu <b>⋮</b> do Chrome.<br>
+
+      2. Procure por
+      <b>“Instalar aplicativo”</b>
+      ou
+      <b>“Adicionar à tela inicial”</b>.<br>
+
+      3. Confirme a instalação.
+
+    `;
+
+    return;
+
+  }
+
+
+  /* =================================================
+     PC / OUTROS NAVEGADORES
+     ================================================= */
+
+  titulo.innerText =
+    "Instale o Meu Terreiro";
+
+  texto.innerHTML =
+    "Você pode instalar o Meu Terreiro no seu computador quando o navegador oferecer essa opção.";
+
+  steps.innerHTML = `
+
+    <strong>No Chrome ou navegador compatível:</strong><br><br>
+
+    Procure o ícone de
+    <b>instalação</b>
+    na barra de endereço ou abra o menu
+    <b>⋮</b>.<br><br>
+
+    Depois escolha
+    <b>“Instalar Meu Terreiro”</b>.
+
+  `;
+
+}
+
+
+/* =====================================================
+   BOTÃO INSTALAR ANDROID / CHROME
+   ===================================================== */
+
+document
+  .getElementById("pwaInstall")
+  .addEventListener("click", async () => {
+
+    if(!deferredPrompt){
+
+      return;
+
+    }
+
+    deferredPrompt.prompt();
+
+    const resultado =
+      await deferredPrompt.userChoice;
 
     console.log(
-      "Orixá do Dia:",
-      dados.nome
+      "Instalação:",
+      resultado.outcome
     );
 
-    console.log(
-      "Dia:",
-      nomesDias[numeroDia]
-    );
+    deferredPrompt = null;
 
-    console.log(
-      "Slides:",
-      dados.slides
-    );
+    document
+      .getElementById("pwaInstall")
+      .style.display =
+      "none";
 
-  </script>
+  });
+
+
+/* =====================================================
+   FECHAR POPUP
+   ===================================================== */
+
+document
+  .getElementById("pwaClose")
+  .addEventListener(
+    "click",
+    () => {
+
+      document
+        .getElementById("pwaOverlay")
+        .style.display =
+        "none";
+
+    }
+  );
+
+
+/* =====================================================
+   FECHA CLICANDO FORA
+   ===================================================== */
+
+document
+  .getElementById("pwaOverlay")
+  .addEventListener(
+    "click",
+    function(event){
+
+      if(
+        event.target === this
+      ){
+
+        this.style.display =
+          "none";
+
+      }
+
+    }
+  );
+
+
+/* =====================================================
+   MOSTRA O POPUP DEPOIS QUE A PÁGINA CARREGAR
+   ===================================================== */
+
+/* O popup inicial agora é o Orixá do Dia.
+   O popup PWA não abre automaticamente para não sobrepor os dois. */
+
+
+/* =====================================================
+   SERVICE WORKER
+   ===================================================== */
+
+if(
+  "serviceWorker" in navigator
+){
+
+  window.addEventListener(
+    "load",
+    () => {
+
+      navigator.serviceWorker
+        .register("./service-worker.js")
+        .then(
+          registration => {
+
+            console.log(
+              "Service Worker registrado:",
+              registration.scope
+            );
+
+          }
+        )
+        .catch(
+          error => {
+
+            console.log(
+              "Erro no Service Worker:",
+              error
+            );
+
+          }
+        );
+
+    }
+  );
+
+}
+
+</script>
+
 </body>
 </html>
